@@ -1,0 +1,126 @@
+# <--- VARIABLES --->
+
+opt=1
+
+# <--- FUNCIONES --->
+
+function menu() {
+    echo "OPCION 0: SALIR DE MENU GESTION DE BASE DE DATOS"
+    echo "OPCION 1: MOSTRAR BASES DE DATOS"
+    echo "OPCION 2: CREAR BASE DE DATOS"
+    echo "OPCION 3: ELIMINAR BASE DE DATOS"
+    echo "OPCION 4: RESPALDAR BASE DE DATOS (DUMP)"
+    echo "OPCION 5: RESTAURAR BASE DE DATOS"
+    echo "OPCION 6: OPTIMIZAR BASES DE DATOS"
+}
+
+function mostrar_bd() {
+    read -p "Usuario de MySQL/MariaDB: " usuario
+    read -s -p "Contraseña: " pass
+    echo ""
+    mysql -u "$usuario" -p"$pass" -e "SHOW DATABASES;"
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function crear_bd() {
+    read -p "Usuario de MySQL/MariaDB: " usuario
+    read -s -p "Contraseña: " pass
+    echo ""
+    read -p "Nombre de la nueva base de datos: " db_nombre
+
+    mysql -u "$usuario" -p"$pass" -e "CREATE DATABASE $db_nombre;"
+    if [ $? -eq 0 ]; then
+        echo "Base de datos '$db_nombre' creada con éxito."
+    else
+        echo "Error al crear la base de datos."
+    fi
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function eliminar_bd() {
+    read -p "Usuario de MySQL/MariaDB: " usuario
+    read -s -p "Contraseña: " pass
+    echo ""
+    read -p "Nombre de la base de datos a eliminar: " db_nombre
+
+    mysql -u "$usuario" -p"$pass" -e "DROP DATABASE $db_nombre;"
+    if [ $? -eq 0 ]; then
+        echo "Base de datos '$db_nombre' eliminada con éxito."
+    else
+        echo "Error al eliminar la base de datos."
+    fi
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function respaldar_bd() {
+    read -p "Usuario de MySQL/MariaDB: " usuario
+    read -s -p "Contraseña: " pass
+    echo ""
+    read -p "Nombre de la base de datos a respaldar: " db_nombre
+    read -p "Ruta/Nombre del archivo de salida (.sql): " archivo
+
+    mysqldump -u "$usuario" -p"$pass" "$db_nombre" > "$archivo"
+    if [ $? -eq 0 ]; then
+        echo "Respaldo guardado con éxito en $archivo"
+    else
+        echo "Error al realizar el respaldo."
+    fi
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function restaurar_bd() {
+    read -p "Usuario de MySQL/MariaDB: " usuario
+    read -s -p "Contraseña: " pass
+    echo ""
+    read -p "Nombre de la base de datos destino: " db_nombre
+    read -p "Ruta del archivo SQL a restaurar: " archivo
+
+    mysql -u "$usuario" -p"$pass" "$db_nombre" < "$archivo"
+    if [ $? -eq 0 ]; then
+        echo "Base de datos restaurada con éxito desde $archivo"
+    else
+        echo "Error al restaurar la base de datos."
+    fi
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function optimizar_bd() {
+    read -p "Usuario de MySQL/MariaDB: " usuario
+    read -s -p "Contraseña: " pass
+    echo ""
+    mysqlcheck -u "$usuario" -p"$pass" --optimize --all-databases
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+# <--- PRINCIPAL --->
+
+while [ $opt != 0 ];
+do
+    menu
+    read -p "Selecciona una Opción" opt
+    case $opt in
+        0) echo "saliendo de menu GESTION DE BASE DE DATOS..."
+           exit
+           ;;
+        1) mostrar_bd
+           ;;
+        2) crear_bd
+           ;;
+        3) eliminar_bd
+           ;;
+        4) respaldar_bd
+           ;;
+        5) restaurar_bd
+           ;;
+        6) optimizar_bd
+           ;;
+        *) echo "opcion invalida, intente denuevo."
+           ;;
+    esac
+done
