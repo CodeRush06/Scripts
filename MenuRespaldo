@@ -1,0 +1,94 @@
+# <--- VARIABLES --->
+
+opt=1
+
+# <--- FUNCIONES --->
+
+function menu() {
+    echo "OPCION 0: SALIR DE MENU GESTION DE RESPALDO"
+    echo "OPCION 1: RESPALDO COMPLETO"
+    echo "OPCION 2: RESPALDO INCREMENTAL"
+    echo "OPCION 3: RESPALDO DIFERENCIAL"
+    echo "OPCION 4: RESPALDO CON HISTORIAL (SNAPSHOT)"
+    echo "OPCION 5: RESPALDO REMOTO (SSH)"
+}
+
+function respaldo_completo() {
+    read -p "Ingrese la ruta origen: " origen
+    read -p "Ingrese la ruta destino: " destino
+
+    rsync -av --delete "$origen/" "$destino/"
+    echo "Respaldo completo finalizado con éxito."
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function respaldo_incremental() {
+    read -p "Ingrese la ruta origen: " origen
+    read -p "Ingrese la ruta destino: " destino
+
+    rsync -av "$origen/" "$destino/"
+    echo "Respaldo incremental finalizado con éxito."
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function respaldo_diferencial() {
+    read -p "Ingrese la ruta del respaldo completo de referencia: " ref
+    read -p "Ingrese la ruta origen: " origen
+    read -p "Ingrese la ruta base para guardar el diferencial: " destino_base
+
+    destino_dif="${destino_base}-$(date +%F)"
+    rsync -av --compare-dest="$ref/" "$origen/" "$destino_dif/"
+    echo "Respaldo diferencial finalizado con éxito en $destino_dif."
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function respaldo_snapshot() {
+    read -p "Ingrese la ruta del respaldo anterior: " anterior
+    read -p "Ingrese la ruta origen: " origen
+    read -p "Ingrese la ruta para el nuevo respaldo: " nuevo
+
+    rsync -av --link-dest="$anterior/" "$origen/" "$nuevo/"
+    echo "Respaldo con historial (Snapshot) finalizado con éxito."
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function respaldo_remoto() {
+    read -p "Ingrese la ruta origen local: " origen
+    read -p "Ingrese el usuario remoto: " usuario
+    read -p "Ingrese el host/IP remoto: " host
+    read -p "Ingrese la ruta destino remota: " destino
+
+    rsync -avz -e ssh "$origen/" "$usuario@$host:$destino/"
+    echo "Respaldo remoto finalizado con éxito."
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+# <--- PRINCIPAL --->
+
+while [ $opt != 0 ];
+do
+    menu
+    read -p "Selecciona una Opción" opt
+    case $opt in
+        0) echo "saliendo de menu GESTION DE RESPALDO..."
+           exit
+           ;;
+        1) respaldo_completo
+           ;;
+        2) respaldo_incremental
+           ;;
+        3) respaldo_diferencial
+           ;;
+        4) respaldo_snapshot
+           ;;
+        5) respaldo_remoto
+           ;;
+        *) echo "opcion invalida, intente denuevo."
+           ;;
+    esac
+done
