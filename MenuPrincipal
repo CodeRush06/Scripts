@@ -1,0 +1,51 @@
+# <--- VARIABLES --->
+
+opt=1
+
+# <---FUNCIONES--->
+
+function menu() {
+    echo "OPCION 0: MENU GESTION DE USUARIOS"
+    echo "OPCION 1: MENU GESTION DE GRUPOS"
+    echo "OPCION 2: MENU GESTION DE RESPALDO"
+    echo "OPCION 3: MENU GESTION DE REDES"
+    echo "OPCION 4: MENU GESTION DE BASE DE DATOS"
+    echo "OPCION 5: MENU GESTION DE FIREWALL"
+    echo "OPCION 6: MENU GESTION DE LOGS"
+    echo "OPCION 7: MENU GESTION DE DOCKER"
+}
+
+# <---PRINCIPAL--->
+
+echo "ingresando a menu principal.."
+sleep 2s
+clear
+while [ $opt != 0 ];
+do
+    menu
+
+    read -p "Selecciona una Opción" opt
+    case $opt in
+    0) echo "saliendo de menu GESTION DE USUARIOS..."
+       exit
+    ;;
+    1) ./MenuUsuario
+    ;;
+    2) ./MenuGrupo
+    ;;
+    3) ./MenuRespaldo
+    ;;
+    4) ./MenuRedes
+    ;;
+    5) ./MenuBD
+    ;;
+    6) ./MenuFirewall
+    ;;
+    7) ./MenuLogs
+    ;;
+    8) ./MenuDocker
+    ;;
+    *) echo "opcion invalida, intente denuevo."
+    ;;
+    esac
+done
