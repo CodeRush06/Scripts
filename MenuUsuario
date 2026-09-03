@@ -1,0 +1,129 @@
+# <--- VARIABLES --->
+
+opt=1
+
+# <--- FUNCIONES --->
+
+function menu() {
+    echo "OPCION 0: SALIR DE MENU GESTION DE USUARIOS"
+    echo "OPCION 1: CREAR USUARIO"
+    echo "OPCION 2: CAMBIAR ATRIBUTO DE USUARIO"
+    echo "OPCION 3: ELIMINAR USUARIO"
+    echo "OPCION 4: BLOQUEAR USUARIO"
+    echo "OPCION 5: DESBLOQUEAR USUARIO"
+    echo "OPCION 6: CAMBIAR CONTRASEÑA"
+    echo "OPCION 7: LISTAR A TODOS LOS USUARIOS"
+}
+
+function crearUsuario() {
+    echo "OPCION CREAR USUARIO HA SIDO CONFIRMADA... presione  para cancelar"
+    sleep 2s
+    read -p "Ingrese nombre de usuario: " nombre
+    read -p "Ingrese grupo del usuario: " grupo
+    read -p "Ingrese home de usuario: " home
+    read -p "Ingrese shell de usuario: " shell
+
+    sudo useradd -m -g "$grupo" -d "/home/$home" -s "$shell" "$nombre"
+    # Asignar CONTRASEÑA
+    if [ $? -eq 0 ]; then
+        echo "Ingrese la contraseña para el nuevo usuario: "
+        sudo passwd "$nombre"
+        echo "¡Usuario registrado en el sistema con éxito!"
+    else
+        echo "Error al crear el usuario."
+    fi
+}
+
+function cambiarUsuario() {
+    read -p "Ingrese el nombre del usuario a modificar: " nombre
+    echo "USUARIO SELECCIONADO: $nombre"
+    echo "1) Cambiar directorio personal"
+    echo "2) Cambiar shell"
+    echo "3) Cambiar nombre de usuario"
+    read -p "Seleccione una opción: " opc
+
+    case $opc in
+        1)
+            read -p "Ingrese el nuevo directorio: " nuevo_dir
+            sudo usermod -d "$nuevo_dir" -m "$nombre"
+            echo "Directorio modificado con éxito."
+            ;;
+        2)
+            read -p "Ingrese la nueva shell (ej. /bin/bash): " nueva_shell
+            sudo usermod -s "$nueva_shell" "$nombre"
+            echo "Shell modificada con éxito."
+            ;;
+        3)
+            read -p "Ingrese el nuevo nombre de usuario: " nuevo_nom
+            sudo usermod -l "$nuevo_nom" "$nombre"
+            echo "Nombre de usuario modificado con éxito."
+            ;;
+        *)
+            echo "Opción no válida."
+            ;;
+    esac
+}
+
+function eliminarUsuario() {
+    read -p "Ingrese el nombre de usuario a eliminar: " nombre
+    read -p "¿Desea eliminar también su directorio personal? (s/n): " eliminar_dir
+
+    if [ "$eliminar_dir" = "s" ]; then
+        sudo userdel -r "$nombre"
+    else
+        sudo userdel "$nombre"
+    fi
+    echo "Usuario eliminado del sistema con éxito."
+}
+
+function desbloquear_user() {
+    read -p "Ingrese el nombre de usuario a desbloquear: " nombre
+    sudo passwd -u "$nombre"
+    echo "Usuario desbloqueado con éxito."
+}
+
+function bloquear_user() {
+    read -p "Ingrese el nombre de usuario a bloquear: " nombre
+    sudo passwd -l "$nombre"
+    echo "Usuario bloqueado con éxito."
+}
+
+function listar_user() {
+    echo "Listando usuarios del sistema ..."
+    cut -d: -f1 /etc/passwd
+}
+
+function cambiar_password() {
+    read -p "Ingrese el nombre de usuario para cambiar contraseña: " nombre
+    read -p "Ingrese la contraseña: " pass
+    echo "$nombre:$pass" | chpasswd
+}
+
+# <--- PRINCIPAL --->
+
+while [ $opt != 0 ];
+do
+    menu
+    read -p "Selecciona una Opción" opt
+    case $opt in
+        0) echo "saliendo de menu GESTION DE USUARIOS..."
+           exit
+           ;;
+        1) crearUsuario
+           ;;
+        2) cambiarUsuario
+           ;;
+        3) eliminarUsuario
+           ;;
+        4) bloquear_user
+           ;;
+        5) desbloquear_user
+           ;;
+        6) cambiar_password
+           ;;
+        7) listar_user
+           ;;
+        *) echo "opcion invalida, intente denuevo."
+           ;;
+    esac
+done
