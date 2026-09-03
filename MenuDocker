@@ -1,0 +1,94 @@
+# <--- VARIABLES --->
+
+opt=1
+
+# <--- FUNCIONES --->
+
+function menu() {
+    echo "OPCION 0: SALIR DE MENU GESTION DE DOCKER"
+    echo "OPCION 1: MOSTRAR CONTENEDORES ACTIVOS"
+    echo "OPCION 2: MOSTRAR TODOS LOS CONTENEDORES"
+    echo "OPCION 3: MOSTRAR IMAGENES"
+    echo "OPCION 4: INICIAR CONTENEDOR"
+    echo "OPCION 5: DETENER CONTENEDOR"
+    echo "OPCION 6: ELIMINAR CONTENEDOR"
+    echo "OPCION 7: VER LOGS DE UN CONTENEDOR"
+}
+
+function listar_activos() {
+    echo -e "\n--- Contenedores en Ejecución ---"
+    sudo docker ps
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function listar_todos() {
+    echo -e "\n--- Todos los Contenedores ---"
+    sudo docker ps -a
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function listar_imagenes() {
+    echo -e "\n--- Imágenes Locales ---"
+    sudo docker images
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function iniciar_contenedor() {
+    read -p "Ingrese Nombre o ID del contenedor a iniciar: " contenedor
+    sudo docker start "$contenedor"
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function detener_contenedor() {
+    read -p "Ingrese Nombre o ID del contenedor a detener: " contenedor
+    sudo docker stop "$contenedor"
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function eliminar_contenedor() {
+    read -p "Ingrese Nombre o ID del contenedor a eliminar: " contenedor
+    sudo docker rm "$contenedor"
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function ver_logs() {
+    read -p "Ingrese Nombre o ID del contenedor: " contenedor
+    sudo docker logs --tail 50 "$contenedor"
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+# <--- PRINCIPAL --->
+
+while [ $opt != 0 ];
+do
+    menu
+    read -p "Selecciona una Opción" opt
+    case $opt in
+        0) echo "saliendo de menu GESTION DE DOCKER..."
+           exit
+           ;;
+        1) listar_activos
+           ;;
+        2) listar_todos
+           ;;
+        3) listar_imagenes
+           ;;
+        4) iniciar_contenedor
+           ;;
+        5) detener_contenedor
+           ;;
+        6) eliminar_contenedor
+           ;;
+        7) ver_logs
+           ;;
+        *) echo "opcion invalida, intente denuevo."
+           ;;
+    esac
+done
