@@ -1,0 +1,80 @@
+# <--- VARIABLES --->
+
+opt=1
+
+# <--- FUNCIONES --->
+
+function menu() {
+    echo "OPCION 0: SALIR DE MENU GESTION DE FIREWALL"
+    echo "OPCION 1: VER ESTADO"
+    echo "OPCION 2: ABRIR PUERTO"
+    echo "OPCION 3: CERRAR PUERTO"
+    echo "OPCION 4: MOSTRAR PUERTOS ABIERTOS"
+    echo "OPCION 5: REINICIAR FIREWALL"
+}
+
+function ver_estado(){
+    sudo firewall-cmd --state
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function abrir_puerto(){
+    read -p "Puerto: " puerto
+    read -p "Protocolo (tcp/udp): " protocolo
+
+    sudo firewall-cmd --permanent --add-port=${puerto}/${protocolo}
+    sudo firewall-cmd --reload
+    echo "Puerto agregado."
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function cerrar_puerto(){
+    read -p "Puerto: " puerto
+    read -p "Protocolo (tcp/udp): " protocolo
+
+    sudo firewall-cmd --permanent --remove-port=${puerto}/${protocolo}
+    sudo firewall-cmd --reload
+    echo "Puerto eliminado."
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function mostrar_puertos(){
+    sudo firewall-cmd --list-ports
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function reiniciar_firewall(){
+    sudo systemctl restart firewalld
+    echo "Firewall reiniciado."
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+# <--- PRINCIPAL --->
+
+while [ $opt != 0 ];
+do
+    menu
+    read -p "Selecciona una Opción" opt
+    case $opt in
+        0) echo "saliendo de menu GESTION DE FIREWALL..."
+           exit
+           ;;
+        1) ver_estado
+           ;;
+        2) abrir_puerto
+           ;;
+        3) cerrar_puerto
+           ;;
+        4) mostrar_puertos
+           ;;
+        5) reiniciar_firewall
+           ;;
+        *) echo "opcion invalida, intente denuevo."
+           ;;
+    esac
+done
