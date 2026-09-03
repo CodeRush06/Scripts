@@ -1,0 +1,82 @@
+# <--- VARIABLES --->
+
+opt=1
+
+# <--- FUNCIONES --->
+
+function menu() {
+    echo "OPCION 0: SALIR DE MENU GESTION DE REDES"
+    echo "OPCION 1: VER ESTADO DE LA RED"
+    echo "OPCION 2: LISTAR CONEXIONES GUARDADAS"
+    echo "OPCION 3: CONECTAR A UNA RED WI-FI"
+    echo "OPCION 4: DESCONECTAR UNA INTERFAZ"
+    echo "OPCION 5: MOSTRAR INTERFACES"
+}
+
+function ver_estado(){
+    echo -e "\n--- Estado General ---"
+    nmcli general status
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function listar_conexiones(){
+    echo -e "\n--- Conexiones Disponibles ---"
+    nmcli connection show
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function conectar_wifi(){
+    echo -e "\n--- Redes Wi-Fi Disponibles ---"
+    nmcli device wifi list
+    echo ""
+    read -p "Nombre de la red (SSID): " ssid
+    read -s -p "Contraseña: " password
+    echo -e "\nConectando..."
+    nmcli device wifi connect "$ssid" password "$password"
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function desconectar_interfaz(){
+    echo -e "\n--- Interfaces Activas ---"
+    nmcli device status
+    echo ""
+    read -p "Nombre del dispositivo a apagar (ej. wlan0): " dispositivo
+    nmcli device disconnect "$dispositivo"
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function mostrar_interfaces(){
+    echo -e "\n--- Dispositivos de Red ---"
+    nmcli device status
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+# <--- PRINCIPAL --->
+
+while [ $opt != 0 ];
+do
+    menu
+    read -p "Selecciona una Opción" opt
+    case $opt in
+        0) echo "saliendo de menu GESTION DE REDES..."
+           exit
+           ;;
+        1) ver_estado
+           ;;
+        2) listar_conexiones
+           ;;
+        3) conectar_wifi
+           ;;
+        4) desconectar_interfaz
+           ;;
+        5) mostrar_interfaces
+           ;;
+        *) echo "opcion invalida, intente denuevo."
+           ;;
+    esac
+done
