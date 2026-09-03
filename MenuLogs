@@ -1,0 +1,97 @@
+# <--- VARIABLES --->
+
+opt=1
+
+# <--- FUNCIONES --->
+
+function menu() {
+    echo "OPCION 0: SALIR DE MENU GESTION DE LOGS"
+    echo "OPCION 1: MOSTRAR TODOS LOS LOGS DEL SISTEMA"
+    echo "OPCION 2: MOSTRAR LOS LOGS DEL ARRANQUE ACTUAL"
+    echo "OPCION 3: MOSTRAR LOGS DEL KERNEL"
+    echo "OPCION 4: MOSTRAR LOGS DE ERRORES"
+    echo "OPCION 5: MOSTRAR LOGS DE APACHE"
+    echo "OPCION 6: MOSTRAR LOGS DE MYSQL"
+    echo "OPCION 7: MOSTRAR LOGS DE FECHA ESPECIFICA"
+    echo "OPCION 8: MOSTRAR LOGS EN SEGUIMIENTO"
+}
+
+function logsTodos() {
+    journalctl
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function logsActual() {
+    journalctl -b
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function logsKernel() {
+    journalctl -k
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function logsError() {
+    journalctl -p error
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function logsApache() {
+    journalctl -u httpd
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function logsMySQL() {
+    journalctl -u mariadb
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function logsFecha() {
+    read -p "Ingresa la fecha (AAAA-MM-DD HH:MM:SS): " fecha
+    journalctl --since "$fecha"
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+function logsSeg() {
+    journalctl -f
+    echo "Presione enter para volver al menú principal"
+    read pausa
+}
+
+# <--- PRINCIPAL --->
+
+while [ $opt != 0 ];
+do
+    menu
+    read -p "Selecciona una Opción" opt
+    case $opt in
+        0) echo "saliendo de menu GESTION DE LOGS..."
+           exit
+           ;;
+        1) logsTodos
+           ;;
+        2) logsActual
+           ;;
+        3) logsKernel
+           ;;
+        4) logsError
+           ;;
+        5) logsApache
+           ;;
+        6) logsMySQL
+           ;;
+        7) logsFecha
+           ;;
+        8) logsSeg
+           ;;
+        *) echo "opcion invalida, intente denuevo."
+           ;;
+    esac
+done
