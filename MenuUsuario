@@ -16,12 +16,44 @@ function menu() {
 }
 
 function crearUsuario() {
-    echo "OPCION CREAR USUARIO HA SIDO CONFIRMADA... presione  para cancelar"
+    echo "OPCION CREAR USUARIO HA SIDO CONFIRMADA..."
     sleep 2s
     read -p "Ingrese nombre de usuario: " nombre
+
+    # "^${nombre}$" exige que sea exactamente ese nombre, ni una letra mas ni una menos.
+
+    #Verifica que el de usuario exista.
+    while cut -d: -f1 /etc/passwd | grep -q "^${nombre}$"; do
+    echo "Ya existe un usuario con ese nombre. Ingrese otro nombre";
+    read -p "Ingrese nombre de usuario: " nombre
+    done
+
+    #Verifica que el nombre de usuario no se haya repetido.
+
+
     read -p "Ingrese grupo del usuario: " grupo
+
+    #Verifica que grupo exista.
+    while ! cut -d: -f1 /etc/group | grep -q "^${grupo}$"; do
+    echo "No existe ese grupo, ingrese uno de estos.";
+    cut -d: -f1 /etc/group
+    read -p "Ingrese grupo del usuario: " grupo
+    done
+
     read -p "Ingrese home de usuario: " home
+    while [ -d "/home/$home" ]; do
+        echo "La carpeta /home/$home ya existe. Eliga otro."
+        read -p "Ingrese nombre para la carpeta HOME: " home
+    done
+
+     #Verifica que el shell exista.
     read -p "Ingrese shell de usuario: " shell
+    while ! grep -q "^${shell}$" /etc/shells; do
+    echo "No existe ese shell, ingrese uno de estos.";
+    grep -v "^#" /etc/shells
+    read -p "Ingrese shell de usuario: " shell
+    done
+
 
     sudo useradd -m -g "$grupo" -d "/home/$home" -s "$shell" "$nombre"
     # Asignar CONTRASEÑA
