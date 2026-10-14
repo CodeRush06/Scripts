@@ -20,7 +20,7 @@ function menu() {
 echo "ingresando a menu principal.."
 sleep 2s
 clear
-while [ $opt != 0 ];
+while [ $opt -ne 0 ];
 do
     menu
 
