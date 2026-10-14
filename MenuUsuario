@@ -68,6 +68,12 @@ function crearUsuario() {
 
 function cambiarUsuario() {
     read -p "Ingrese el nombre del usuario a modificar: " nombre
+    #Verificar que ese usuario existe
+     while ! cut -d: -f1 /etc/passwd | grep -q "^${nombre}$"; do
+    echo "Ese usuario no existe";
+    read -p "Ingrese el nombre del usuario a modificar: " nombre
+    done
+
     echo "USUARIO SELECCIONADO: $nombre"
     echo "1) Cambiar directorio personal"
     echo "2) Cambiar shell"
@@ -82,11 +88,24 @@ function cambiarUsuario() {
             ;;
         2)
             read -p "Ingrese la nueva shell (ej. /bin/bash): " nueva_shell
+
+            while ! grep -q "^${nueva_shell}$" /etc/shells; do
+            echo "No existe ese shell, ingrese uno de estos.";
+            grep -v "^#" /etc/shells
+            read -p "Ingrese la nueva shell (ej. /bin/bash): " nueva_shell
+            done
+
             sudo usermod -s "$nueva_shell" "$nombre"
             echo "Shell modificada con éxito."
             ;;
         3)
             read -p "Ingrese el nuevo nombre de usuario: " nuevo_nom
+
+         while cut -d: -f1 /etc/passwd | grep -q "^${nuevo_nom}$"; do
+        echo "Ese nombre ya esta en uso";
+         read -p "Ingrese el nuevo nombre de usuario: " nuevo_nom
+        done
+
             sudo usermod -l "$nuevo_nom" "$nombre"
             echo "Nombre de usuario modificado con éxito."
             ;;
@@ -98,6 +117,12 @@ function cambiarUsuario() {
 
 function eliminarUsuario() {
     read -p "Ingrese el nombre de usuario a eliminar: " nombre
+      #Verifica que el de usuario exista.
+    while ! cut -d: -f1 /etc/passwd | grep -q "^${nombre}$"; do
+    echo "Ya existe un usuario con ese nombre. Ingrese otro nombre";
+    read -p "Ingrese nombre de usuario: " nombre
+    done
+
     read -p "¿Desea eliminar también su directorio personal? (s/n): " eliminar_dir
 
     if [ "$eliminar_dir" = "s" ]; then
@@ -110,12 +135,24 @@ function eliminarUsuario() {
 
 function desbloquear_user() {
     read -p "Ingrese el nombre de usuario a desbloquear: " nombre
+      #Verifica que el de usuario exista.
+    while ! cut -d: -f1 /etc/passwd | grep -q "^${nombre}$"; do
+    echo "Ya existe un usuario con ese nombre. Ingrese otro nombre";
+    read -p "Ingrese nombre de usuario: " nombre
+    done
+
     sudo passwd -u "$nombre"
     echo "Usuario desbloqueado con éxito."
 }
 
 function bloquear_user() {
     read -p "Ingrese el nombre de usuario a bloquear: " nombre
+      #Verifica que el de usuario exista.
+    while ! cut -d: -f1 /etc/passwd | grep -q "^${nombre}$"; do
+    echo "Ya existe un usuario con ese nombre. Ingrese otro nombre";
+    read -p "Ingrese nombre de usuario: " nombre
+    done
+
     sudo passwd -l "$nombre"
     echo "Usuario bloqueado con éxito."
 }
@@ -127,13 +164,19 @@ function listar_user() {
 
 function cambiar_password() {
     read -p "Ingrese el nombre de usuario para cambiar contraseña: " nombre
+      #Verifica que el de usuario exista.
+    while ! cut -d: -f1 /etc/passwd | grep -q "^${nombre}$"; do
+    echo "Ya existe un usuario con ese nombre. Ingrese otro nombre";
+    read -p "Ingrese nombre de usuario: " nombre
+    done
+
     read -p "Ingrese la contraseña: " pass
     echo "$nombre:$pass" | chpasswd
 }
 
 # <--- PRINCIPAL --->
 
-while [ $opt != 0 ];
+while [ $opt -ne 0 ];
 do
     menu
     read -p "Selecciona una Opción" opt
