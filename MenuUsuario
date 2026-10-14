@@ -176,7 +176,7 @@ function cambiar_password() {
 
 # <--- PRINCIPAL --->
 
-while [ $opt -ne 0 ];
+while [ "$opt" -ne 0 ];
 do
     menu
     read -p "Selecciona una Opción" opt
