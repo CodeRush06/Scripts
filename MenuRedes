@@ -29,11 +29,20 @@ function listar_conexiones(){
 function desconectar_interfaz(){
     echo -e "\n--- Interfaces Activas ---"
     nmcli device status
-    echo ""
-    read -p "Nombre del dispositivo a apagar (ej. wlan0): " dispositivo
+    
+    read -p "Nombre del dispositivo a apagar: " dispositivo
+    
+    while [ -z "$dispositivo" ]; do
+        echo "Error: Debe ingresar el nombre de un dispositivo."
+        read -p "Nombre del dispositivo a apagar: " dispositivo
+    done
+    echo "Desconectando el dispositivo '$dispositivo'"
     nmcli device disconnect "$dispositivo"
-    echo "Presione enter para volver al menú principal"
-    read pausa
+    
+    if [ $? -ne 0 ]; then
+        echo "No se pudo desconectar el dispositivo."
+    fi
+    read -p "Presione enter para volver al menú principal" pausa
 }
 
 function mostrar_interfaces(){
