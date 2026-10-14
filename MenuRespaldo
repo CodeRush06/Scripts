@@ -15,18 +15,59 @@ function menu() {
 
 function respaldo_completo() {
     read -p "Ingrese la ruta origen: " origen
-    read -p "Ingrese la ruta destino: " destino
+
+     while [ ! -d "$origen" ]; do
+        echo "Esta ruta no existe o es inválida. Ingrese otra ruta."
+        read -p "Ingrese la ruta origen: " origen
+    done
+
+     read -p "Ingrese la ruta destino: " destino
+
+      while [ ! -d "$destino" ]; do
+        read -p "Esta ruta no existe o es inválida. ¿Quiere crear esta ruta? (S/N): " crearRuta
+        
+        if [ "$crearRuta" = "S" ] || [ "$crearRuta" = "s" ]; then
+            mkdir -p "$destino"
+            
+                if [ $? -ne 0 ]; then
+                echo "No se pudo crear la ruta. Ingrese otra."
+                read -p "Ingrese la ruta destino: " destino
+            fi
+        else
+            read -p "Ingrese otra ruta destino: " destino
+        fi
+    done
 
     rsync -av --delete "$origen/" "$destino/"
     echo "Respaldo completo finalizado con éxito."
     echo "Presione enter para volver al menú principal"
     read pausa
 }
-
 function respaldo_incremental() {
     read -p "Ingrese la ruta origen: " origen
-    read -p "Ingrese la ruta destino: " destino
+    while [ ! -d "$origen" ]; do
+        echo "Esta ruta no existe o es inválida. Ingrese otra ruta."
+        read -p "Ingrese la ruta origen: " origen
+    done
 
+    read -p "Ingrese la ruta destino: " destino
+    
+    while [ ! -d "$destino" ]; do
+        read -p "Esta ruta no existe o es inválida. ¿Quiere crear esta ruta? (S/N): " crearRuta
+        
+        if [ "$crearRuta" = "S" ] || [ "$crearRuta" = "s" ]; then
+            mkdir -p "$destino"
+            
+                if [ $? -ne 0 ]; then
+                echo "No se pudo crear la ruta. Ingrese otra."
+                read -p "Ingrese la ruta destino: " destino
+            fi
+        else
+            read -p "Ingrese otra ruta destino: " destino
+        fi
+    done
+
+    # 3. Ejecución del respaldo
     rsync -av "$origen/" "$destino/"
     echo "Respaldo incremental finalizado con éxito."
     echo "Presione enter para volver al menú principal"
@@ -35,7 +76,15 @@ function respaldo_incremental() {
 
 function respaldo_diferencial() {
     read -p "Ingrese la ruta del respaldo completo de referencia: " ref
+    while [ ! -d "$ref" ]; do
+        echo "El directorio de referencia no existe."
+        read -p "Ingrese una ruta de referencia válida: " ref
+    done
     read -p "Ingrese la ruta origen: " origen
+       while [ ! -d "$origen" ]; do
+    echo "Esta ruta no existe o es invalida. Ingrese otra ruta."
+    read -p "Ingrese la ruta origen: " origen
+    done
     read -p "Ingrese la ruta base para guardar el diferencial: " destino_base
 
     destino_dif="${destino_base}-$(date +%F)"
@@ -47,7 +96,16 @@ function respaldo_diferencial() {
 
 function respaldo_snapshot() {
     read -p "Ingrese la ruta del respaldo anterior: " anterior
+    while [ ! -d "$anterior" ]; do
+        echo "El directorio anterior no existe."
+        read -p "Ingrese una ruta anterior válida: " anterior
+    done
     read -p "Ingrese la ruta origen: " origen
+
+     while [ ! -d "$origen" ]; do
+    echo "Esta ruta no existe o es invalida. Ingrese otra ruta."
+    read -p "Ingrese la ruta origen: " origen
+    done
     read -p "Ingrese la ruta para el nuevo respaldo: " nuevo
 
     rsync -av --link-dest="$anterior/" "$origen/" "$nuevo/"
@@ -58,9 +116,20 @@ function respaldo_snapshot() {
 
 function respaldo_remoto() {
     read -p "Ingrese la ruta origen local: " origen
+
+  while [ ! -d "$origen" ]; do
+    echo "Esta ruta no existe o es invalida. Ingrese otra ruta."
+    read -p "Ingrese la ruta origen: " origen
+    done    
+
     read -p "Ingrese el usuario remoto: " usuario
     read -p "Ingrese el host/IP remoto: " host
     read -p "Ingrese la ruta destino remota: " destino
+    
+    while [ -z "$destino" ]; do
+        echo "La ruta destino remota no puede estar vacía."
+        read -p "Ingrese la ruta destino remota: " destino
+    done
 
     rsync -avz -e ssh "$origen/" "$usuario@$host:$destino/"
     echo "Respaldo remoto finalizado con éxito."
@@ -70,7 +139,7 @@ function respaldo_remoto() {
 
 # <--- PRINCIPAL --->
 
-while [ $opt != 0 ];
+while [ "$opt" -ne 0 ];
 do
     menu
     read -p "Selecciona una Opción" opt
