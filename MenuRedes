@@ -26,19 +26,6 @@ function listar_conexiones(){
     echo "Presione enter para volver al menú principal"
     read pausa
 }
-
-function conectar_wifi(){
-    echo -e "\n--- Redes Wi-Fi Disponibles ---"
-    nmcli device wifi list
-    echo ""
-    read -p "Nombre de la red (SSID): " ssid
-    read -s -p "Contraseña: " password
-    echo -e "\nConectando..."
-    nmcli device wifi connect "$ssid" password "$password"
-    echo "Presione enter para volver al menú principal"
-    read pausa
-}
-
 function desconectar_interfaz(){
     echo -e "\n--- Interfaces Activas ---"
     nmcli device status
